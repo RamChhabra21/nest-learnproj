@@ -9,10 +9,9 @@ import { Connection } from 'mysql2/typings/mysql/lib/Connection';
 @Injectable()
 export class UsersService {
     constructor(@InjectRepository(User) private readonly userRepository : Repository<User>){}
-
     createUser(createUserDto : CreateUserDto){
         // this is done after validation 
-        const newUser = this.userRepository.create(createUserDto);
+        const newUser : User = this.userRepository.create(createUserDto);
         return this.userRepository.save(newUser);
     }
 

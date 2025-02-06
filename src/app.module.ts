@@ -8,6 +8,8 @@ import { BlogsController } from './blogs/blogs.controller';
 import { BlogsModule } from './blogs/blogs.module';
 import entities, { User } from './typeorm/Entities'
 import { Blog } from './typeorm/Blog';
+import { CommentsModule } from './comments/comments.module';
+import { Comment } from './typeorm/Comment';
 
 @Module({
   imports: [UsersModule, AuthModule,
@@ -18,10 +20,11 @@ import { Blog } from './typeorm/Blog';
       username: 'root',
       password: '12345678',
       database: 'test_db',
-      entities: [User,Blog,__dirname + '/../**/*.entity.{js,ts}'],
+      entities: [User,Blog,Comment,__dirname + '/../**/*.entity.{js,ts}'],
       synchronize: true,
     }),
     BlogsModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

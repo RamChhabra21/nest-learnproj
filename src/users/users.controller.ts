@@ -20,7 +20,7 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UpdateUserDto } from './dto/UpdateUser.dto';
 import { currentUser } from 'src/auth/decorators/currentUser.decorator';
 import { User } from 'src/typeorm/User';
-import { GlobalService } from 'src/utils/global.serivice';
+import { GlobalService } from 'src/utils/global.service';
 
 @Controller('users')
 export class UsersController {
@@ -45,7 +45,7 @@ export class UsersController {
 
   @Roles(['admin'])
   @UseGuards(JWTAuthGuard, AuthorizationGuard)
-  @Get('get/:id')
+  @Get(':id')
   getuser(@Param('id') id: number) {
     return this.userService.readUser(id);
   }

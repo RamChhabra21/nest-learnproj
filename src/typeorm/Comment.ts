@@ -1,51 +1,45 @@
 import {
   Column,
-  Entity,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
-export class User {
+export class Comment {
   @PrimaryGeneratedColumn({
     type: 'bigint',
-    name: 'user_id',
+    name: 'Comment_id',
   })
   id: number; // this is a PK
 
   @Column({
-    name: 'username',
-    nullable: false,
-  })
-  username: string;
-
-  @Column({
-    name: 'email_address',
-    nullable: false,
+    name: 'content',
+    nullable: true,
     default: '',
   })
-  emailaddress: string;
+  content: string;
 
   @Column({
-    name: 'password',
+    name: 'is_public',
     nullable: false,
-    default: '',
+    default: true,
   })
-  password: string;
+  is_public: boolean;
 
   @Column({
-    type: 'bigint',
-    name: 'contact',
+    name: 'blog_id',
     nullable: true,
   })
-  contact_no: number;
+  blog_id: number; // works as FK 1 
 
   @Column({
-    name: 'role',
-    default: 'user',
+    name: 'author_id',
+    nullable: true,
   })
-  role: string;
+  author_id: number; // works as FK 2 
 
   @CreateDateColumn({
     type: 'timestamp',

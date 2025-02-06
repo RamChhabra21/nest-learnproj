@@ -17,7 +17,7 @@ export class BlogsService {
 
   createBlog(createBlogDto: CreateBlogDto) {
     // this is done after validation
-    const newBlog = this.BlogRepository.create({
+    const newBlog : Blog = this.BlogRepository.create({
         content : createBlogDto.content,
         is_public : (createBlogDto.is_public?true:false),
         author_id : createBlogDto.author_id
