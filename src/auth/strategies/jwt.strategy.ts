@@ -16,8 +16,6 @@ export class JwtStrategy extends PassportStrategy(Strategy){
 
     validate(payload){
         // addtional checks can be applied
-        console.log("Inside the jwt strategy")
-        console.log("payload : ", payload)
         GlobalService.user_id = payload.id;
         return payload
     }

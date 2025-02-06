@@ -35,6 +35,22 @@ export class UsersController {
   //   return {};
   // }
 
+  // returns list of a random (fixed size) set of (all public) + (your private) blogs
+  @Get('/feed')
+  @UseGuards(JWTAuthGuard)
+  publicfeed() {
+    if(!GlobalService.user_id) return new UnauthorizedException();
+    return this.userService.getPublicFeed();
+  }
+
+  // returns list of user's private and public blogs
+  @Get('feed/my')
+  @UseGuards(JWTAuthGuard)
+  myblogs(@Param('id') id: string) {
+    if (!GlobalService.user_id) return new UnauthorizedException();
+    return this.userService.getPrivateFeed();
+  }
+
   // registeration is equivalent to user creation
   @Post('create')
   @UsePipes(ValidationPipe)
@@ -63,19 +79,5 @@ export class UsersController {
   delete(@Param('id') id: number) {
     console.log('reached delete method');
     return this.userService.deleteUser(id);
-  }
-
-  // returns list of a random (fixed size) set of (all public) + (your private) blogs
-  @Get('feed')
-  publicfeed() {
-    if(!GlobalService.user_id) return new UnauthorizedException();
-
-  }
-
-  // returns list of user's private and public blogs
-  @Get('feed/my')
-  myblogs(@Param('id') id: string) {
-    if(!GlobalService.user_id) return new UnauthorizedException();
-    
   }
 }
