@@ -6,25 +6,33 @@ import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BlogsController } from './blogs/blogs.controller';
 import { BlogsModule } from './blogs/blogs.module';
-import entities, { User } from './typeorm/Entities'
+import entities, { User } from './typeorm/Entities';
 import { Blog } from './typeorm/Blog';
 import { CommentsModule } from './comments/comments.module';
 import { Comment } from './typeorm/Comment';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [UsersModule, AuthModule,
+  imports: [
+    UsersModule,
+    AuthModule,
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
-      port: 3306,
+      port: (process.env.db_port ? parseInt(process.env.db_port) : 3306),
       username: 'root',
       password: '12345678',
       database: 'test_db',
-      entities: [User,Blog,Comment,__dirname + '/../**/*.entity.{js,ts}'],
+      entities: [User, Blog, Comment, __dirname + '/../**/*.entity.{js,ts}'],
       synchronize: true,
     }),
     BlogsModule,
     CommentsModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      expandVariables: true,
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

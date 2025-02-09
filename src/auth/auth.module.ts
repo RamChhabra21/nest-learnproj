@@ -9,17 +9,20 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Entity } from 'typeorm';
 import { User } from 'src/typeorm/User';
 import entities from 'src/typeorm/Entities';
+import { env } from 'process';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     PassportModule,
+    ConfigModule.forRoot(),
     JwtModule.register({
-      secret : '123',
-      signOptions : {expiresIn : '1h'} 
+      secret: `${process.env.auth_secret}`,
+      signOptions: { expiresIn: process.env.auth_expires_in },
     }),
-    TypeOrmModule.forFeature(entities)
+    TypeOrmModule.forFeature(entities),
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
-  controllers: [AuthController]
+  controllers: [AuthController],
 })
 export class AuthModule {}

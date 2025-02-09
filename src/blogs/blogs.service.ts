@@ -1,26 +1,23 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Blog } from 'src/typeorm/Blog';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, QueryBuilder, Repository } from 'typeorm';
 import { CreateBlogDto } from './dto/CreateBlog.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { AuthorizationGuard } from 'src/auth/guards/access.guard';
-import { Reflector } from '@nestjs/core';
-import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
+import { Comment } from 'src/typeorm/Comment';
+import { GlobalService } from 'src/utils/global.service';
 
 @Injectable()
 export class BlogsService {
   // all blog related actions here
-  constructor(
-    @InjectRepository(Blog) private readonly BlogRepository: Repository<Blog>,
-  ) {}
+    constructor(@InjectRepository(Blog) private readonly BlogRepository : Repository<Blog>,
+    @InjectRepository(Comment) private readonly CommentRepository : Repository<Comment>){}
 
   createBlog(createBlogDto: CreateBlogDto) {
     // this is done after validation
-    const newBlog : Blog = this.BlogRepository.create({
-        content : createBlogDto.content,
-        is_public : (createBlogDto.is_public?true:false),
-        author_id : createBlogDto.author_id
+    const newBlog: Blog = this.BlogRepository.create({
+      content: createBlogDto.content,
+      is_public: createBlogDto.is_public ? true : false,
+      author_id: createBlogDto.author_id,
     });
     return this.BlogRepository.save(newBlog);
   }
@@ -29,11 +26,22 @@ export class BlogsService {
     return this.BlogRepository.findOneBy({ id });
   }
 
-  updateBlog(id: number, updateBlog: {}) {
+  async updateBlog(id: number, updateBlog: {}) {
     return this.BlogRepository.update(id, updateBlog);
   }
 
-  deleteBlog(Blog_id: number) {
-    return this.BlogRepository.delete(Blog_id);
+  async deleteBlog(blog_id: number) {
+    return this.BlogRepository.delete(blog_id);
+  }
+
+  getComments(blog_id: number) {
+    // perform joins etc in blog and comment repo to get comments
+    const conditions = {
+      ...(blog_id ? { blog_id } : {})
+    };
+
+    return this.CommentRepository.find({
+      where : conditions,
+    });
   }
 }

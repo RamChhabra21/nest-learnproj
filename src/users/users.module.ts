@@ -7,10 +7,8 @@ import { BlogsService } from 'src/blogs/blogs.service';
 import { BlogsModule } from 'src/blogs/blogs.module';
 
 @Module({
-    imports:[
-        TypeOrmModule.forFeature([User]),BlogsModule
-    ],
-    controllers:[UsersController],
-    providers:[UsersService,BlogsService],
+  imports: [TypeOrmModule.forFeature([User]), BlogsModule],
+  controllers: [UsersController],
+  providers: [UsersService, BlogsService],
 })
 export class UsersModule {}

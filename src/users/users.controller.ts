@@ -21,21 +21,13 @@ import { UpdateUserDto } from './dto/UpdateUser.dto';
 import { currentUser } from 'src/auth/decorators/currentUser.decorator';
 import { User } from 'src/typeorm/User';
 import { GlobalService } from 'src/utils/global.service';
+import { env } from 'process';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
-  // @Roles(['admin'])
-  // @UseGuards(JWTAuthGuard, AuthorizationGuard)
-  // @Get('')
-  // findall(@Query('name') name?: string) {
-  //   // implement the logic to return all users
-  //   // return this.userService.findallusers(name);
-  //   return {};
-  // }
-
-  // returns list of a random (fixed size) set of (all public) + (your private) blogs
+  // returns list of (all public) + (your private) blogs
   @Get('/feed')
   @UseGuards(JWTAuthGuard)
   publicfeed() {

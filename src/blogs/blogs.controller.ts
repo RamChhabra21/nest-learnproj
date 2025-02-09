@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  UnauthorizedException,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -17,21 +18,11 @@ import { JWTAuthGuard } from 'src/auth/guards/jwt.guard';
 import { AuthorizationGuard } from 'src/auth/guards/access.guard';
 import { CreateBlogDto } from './dto/CreateBlog.dto';
 import { UpdateBlogDto } from './dto/UpdateBlog.dto';
-import { AuthController } from 'src/auth/auth.controller';
-import { User } from 'src/typeorm/User';
-import { currentUser } from 'src/auth/decorators/currentUser.decorator';
+import { GlobalService } from 'src/utils/global.service';
 
 @Controller('blogs')
 export class BlogsController {
   constructor(private readonly blogService: BlogsService) {}
-  @Roles(['admin'])
-  @UseGuards(JWTAuthGuard, AuthorizationGuard)
-  @Get('')
-  findall(@Query('name') name?: string) {
-    // implement the logic to return all blogs
-    // return this.blogService.findallblogs(name);
-    return {};
-  }
 
   // new blog creation
   @Post('create')
@@ -48,18 +39,30 @@ export class BlogsController {
     return this.blogService.readBlog(id);
   }
 
-  @Roles(['admin', 'selfblog'])
+  // fetch all comments (comment ids) related to a particular blog
+  @UseGuards(JWTAuthGuard)
+  @Get(':id/comments')
+  getcomments(@Param('id') id: number) {
+    return this.blogService.getComments(id);
+  }
+
+  @Roles(['admin', 'self'])
   @UseGuards(JWTAuthGuard, AuthorizationGuard)
   @Patch('update/:id')
-  updateblog(@Param('id') id: number, @Body() updatedBlog: UpdateBlogDto) {
+  async updateblog(@Param('id') id: number, @Body() updatedBlog: UpdateBlogDto) {
+    const blog =  await this.blogService.readBlog(id) ; 
+    console.log(blog?.author_id," ", GlobalService.user_id)
+    console.log(blog?.author_id !== GlobalService.user_id);
+    if(blog?.author_id !== GlobalService.user_id) return new UnauthorizedException();
     return this.blogService.updateBlog(id, updatedBlog);
   }
 
-  @Roles(['admin', 'selfblog'])
+  @Roles(['admin', 'self'])
   @UseGuards(JWTAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
-  delete(@Param('id') id: number) {
-    console.log('reached delete method');
+  async delete(@Param('id') id: number) {
+    const blog =  await this.blogService.readBlog(id) ; 
+    if(blog?.author_id ! === GlobalService.user_id) return new UnauthorizedException();
     return this.blogService.deleteBlog(id);
   }
 }
