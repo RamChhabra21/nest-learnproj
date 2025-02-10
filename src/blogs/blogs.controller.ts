@@ -34,22 +34,30 @@ export class BlogsController {
 
   @Roles(['admin'])
   @UseGuards(JWTAuthGuard, AuthorizationGuard)
-  @Get('get/:id')
-  getblog(@Param('id') id: number) {
+  @Get(':id')
+  getBlog(@Param('id') id: number) {
     return this.blogService.readBlog(id);
   }
 
+  @Roles(['admin'])
+  @UseGuards(JWTAuthGuard, AuthorizationGuard)
+  @Get('')
+  getRangeBlogs(@Query('from') from , @Query('to') to ){
+    return this.blogService.getRangeBlogs(from,to);
+  }
+
   // fetch all comments (comment ids) related to a particular blog
-  @UseGuards(JWTAuthGuard)
+  @Roles(['admin'])
+  @UseGuards(JWTAuthGuard, AuthorizationGuard)
   @Get(':id/comments')
-  getcomments(@Param('id') id: number) {
+  getComments(@Param('id') id: number) {
     return this.blogService.getComments(id);
   }
 
-  @Roles(['admin', 'self'])
+  @Roles(['admin'])
   @UseGuards(JWTAuthGuard, AuthorizationGuard)
   @Patch('update/:id')
-  async updateblog(@Param('id') id: number, @Body() updatedBlog: UpdateBlogDto) {
+  async updateBlog(@Param('id') id: number, @Body() updatedBlog: UpdateBlogDto) {
     const blog =  await this.blogService.readBlog(id) ; 
     console.log(blog?.author_id," ", GlobalService.user_id)
     console.log(blog?.author_id !== GlobalService.user_id);
@@ -57,10 +65,10 @@ export class BlogsController {
     return this.blogService.updateBlog(id, updatedBlog);
   }
 
-  @Roles(['admin', 'self'])
+  @Roles(['admin'])
   @UseGuards(JWTAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
-  async delete(@Param('id') id: number) {
+  async deleteBlog(@Param('id') id: number) {
     const blog =  await this.blogService.readBlog(id) ; 
     if(blog?.author_id ! === GlobalService.user_id) return new UnauthorizedException();
     return this.blogService.deleteBlog(id);

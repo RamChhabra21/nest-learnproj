@@ -9,14 +9,6 @@ import { UpdateCommentDto} from './dto/UpdateComment.dto';
 @Controller('comments')
 export class CommentsController {
   constructor(private readonly CommentService: CommentsService) {}
-  @Roles(['admin'])
-  @UseGuards(JWTAuthGuard, AuthorizationGuard)
-  @Get('')
-  findall(@Query('name') name?: string) {
-    // implement the logic to return all Comments
-    // return this.CommentService.findallComments(name);
-    return {};
-  }
 
   // new Comment creation
   @Post('create')
@@ -33,6 +25,13 @@ export class CommentsController {
     return this.CommentService.readComment(id);
   }
 
+  @Roles(['admin'])
+  @UseGuards(JWTAuthGuard, AuthorizationGuard)
+  @Get('')
+  getRangeComments(@Query('from') from , @Query('to') to ){
+    return this.CommentService.getRangeComments(from,to);
+  }
+
   @Roles(['admin', 'selfComment'])
   @UseGuards(JWTAuthGuard, AuthorizationGuard)
   @Patch('update/:id')
@@ -43,7 +42,7 @@ export class CommentsController {
   @Roles(['admin', 'selfComment'])
   @UseGuards(JWTAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
-  delete(@Param('id') id: number) {
+  deleteComment(@Param('id') id: number) {
     console.log('reached delete method');
     return this.CommentService.deleteComment(id);
   }

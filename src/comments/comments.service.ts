@@ -12,16 +12,17 @@ import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-hos
 export class CommentsService {
   // all Comment related actions here
   constructor(
-    @InjectRepository(Comment) private readonly CommentRepository: Repository<Comment>,
+    @InjectRepository(Comment)
+    private readonly CommentRepository: Repository<Comment>,
   ) {}
 
   createComment(createCommentDto: CreateCommentDto) {
     // this is done after validation
-    const newComment : Comment = this.CommentRepository.create({
-        content : createCommentDto.content,
-        is_public : (createCommentDto.is_public?true:false),
-        author_id : createCommentDto.author_id,
-        blog_id : createCommentDto.blog_id
+    const newComment: Comment = this.CommentRepository.create({
+      content: createCommentDto.content,
+      is_public: createCommentDto.is_public ? true : false,
+      author_id: createCommentDto.author_id,
+      blog_id: createCommentDto.blog_id,
     });
     return this.CommentRepository.save(newComment);
   }
@@ -36,5 +37,14 @@ export class CommentsService {
 
   deleteComment(Comment_id: number) {
     return this.CommentRepository.delete(Comment_id);
+  }
+
+  async getRangeComments(from: number = 1, to: number = 1e9) {
+    console.log(to);
+    const reqcomments = await this.CommentRepository.find({
+      take: to - from + 1,
+      skip: from - 1,
+    });
+    return reqcomments;
   }
 }

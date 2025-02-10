@@ -9,8 +9,11 @@ import { GlobalService } from 'src/utils/global.service';
 @Injectable()
 export class BlogsService {
   // all blog related actions here
-    constructor(@InjectRepository(Blog) private readonly BlogRepository : Repository<Blog>,
-    @InjectRepository(Comment) private readonly CommentRepository : Repository<Comment>){}
+  constructor(
+    @InjectRepository(Blog) private readonly BlogRepository: Repository<Blog>,
+    @InjectRepository(Comment)
+    private readonly CommentRepository: Repository<Comment>,
+  ) {}
 
   createBlog(createBlogDto: CreateBlogDto) {
     // this is done after validation
@@ -34,14 +37,22 @@ export class BlogsService {
     return this.BlogRepository.delete(blog_id);
   }
 
+  async getRangeBlogs(from: number = 1, to: number = 1e9) {
+    const reqblogs = await this.BlogRepository.find({
+      take: to - from + 1,
+      skip: from - 1,
+    });
+    return reqblogs;
+  }
+
   getComments(blog_id: number) {
-    // perform joins etc in blog and comment repo to get comments
+    // perform operations (no joins req as of now) etc in blog and comment repo to get comments
     const conditions = {
-      ...(blog_id ? { blog_id } : {})
+      ...(blog_id ? { blog_id } : {}),
     };
 
     return this.CommentRepository.find({
-      where : conditions,
+      where: conditions,
     });
   }
 }
