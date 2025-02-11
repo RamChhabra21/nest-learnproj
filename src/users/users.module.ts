@@ -7,17 +7,22 @@ import { BlogsService } from 'src/blogs/blogs.service';
 import { BlogsModule } from 'src/blogs/blogs.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     BlogsModule,
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60,
-        limit: 3,
-      },
-    ]),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config) => [
+        {
+          ttl: config.get('THROTTLE_TTL'),
+          limit: config.get('THROTTLE_LIMIT'),
+        },
+      ],
+    }),
   ],
   controllers: [UsersController],
   providers: [UsersService, BlogsService,
