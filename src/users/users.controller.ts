@@ -2,13 +2,18 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Patch,
   Post,
   Query,
   UnauthorizedException,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -22,6 +27,8 @@ import { currentUser } from 'src/auth/decorators/currentUser.decorator';
 import { User } from 'src/typeorm/User';
 import { GlobalService } from 'src/utils/global.service';
 import { env } from 'process';
+import { FileInterceptor } from '@nestjs/platform-express';
+import multer from 'multer';
 
 @Controller('users')
 export class UsersController {
@@ -49,6 +56,21 @@ export class UsersController {
   createuser(@Body() createUserDto: CreateUserDto) {
     console.log('User Creation Data Object Received : ', createUserDto);
     return this.userService.createUser(createUserDto);
+  }
+
+  @Post('profile/upload')
+  @UseGuards(JWTAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  uploadFile(@UploadedFile(
+    new ParseFilePipe({
+      validators : [
+        new MaxFileSizeValidator({ maxSize : 1000}),
+        // new FileTypeValidator({fileType : 'image/jpeg'})
+      ]
+    })
+  ) file : Express.Multer.File){
+    console.log(file)
+    this.userService.uploadFile(file.originalname,file.buffer);
   }
 
   @Roles(['admin'])

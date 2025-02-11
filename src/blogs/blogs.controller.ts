@@ -28,7 +28,6 @@ export class BlogsController {
   @Post('create')
   @UsePipes(ValidationPipe)
   createblog(@Body() createBlogDto: CreateBlogDto) {
-    console.log('Blog Creation Data Object Received : ', createBlogDto);
     return this.blogService.createBlog(createBlogDto);
   }
 
@@ -59,8 +58,6 @@ export class BlogsController {
   @Patch('update/:id')
   async updateBlog(@Param('id') id: number, @Body() updatedBlog: UpdateBlogDto) {
     const blog =  await this.blogService.readBlog(id) ; 
-    console.log(blog?.author_id," ", GlobalService.user_id)
-    console.log(blog?.author_id !== GlobalService.user_id);
     if(blog?.author_id !== GlobalService.user_id) return new UnauthorizedException();
     return this.blogService.updateBlog(id, updatedBlog);
   }

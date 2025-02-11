@@ -14,7 +14,6 @@ export class CommentsController {
   @Post('create')
   @UsePipes(ValidationPipe)
   createComment(@Body() createCommentDto: CreateCommentDto) {
-    console.log('Comment Creation Data Object Received : ', createCommentDto);
     return this.CommentService.createComment(createCommentDto);
   }
 
@@ -43,7 +42,6 @@ export class CommentsController {
   @UseGuards(JWTAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
   deleteComment(@Param('id') id: number) {
-    console.log('reached delete method');
     return this.CommentService.deleteComment(id);
   }
 }

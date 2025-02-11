@@ -40,7 +40,6 @@ export class CommentsService {
   }
 
   async getRangeComments(from: number = 1, to: number = 1e9) {
-    console.log(to);
     const reqcomments = await this.CommentRepository.find({
       take: to - from + 1,
       skip: from - 1,

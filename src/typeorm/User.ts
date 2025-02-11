@@ -47,6 +47,12 @@ export class User {
   })
   role: string;
 
+  @Column({
+    name: 'profile_url',
+    default: '',
+  })
+  profile_url: string;
+
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
