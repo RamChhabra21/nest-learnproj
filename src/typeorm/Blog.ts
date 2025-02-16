@@ -2,12 +2,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
+  Index,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
+@Index(["author_id", "updated_at"])
 export class Blog {
   @PrimaryGeneratedColumn({
     type: 'bigint',

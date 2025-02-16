@@ -42,7 +42,28 @@ export class BlogsController {
   @UseGuards(JWTAuthGuard, AuthorizationGuard)
   @Get('')
   getRangeBlogs(@Query('from') from , @Query('to') to ){
-    return this.blogService.getRangeBlogs(from,to);
+    return this.blogService.getRangeBlogs(from,to,20);
+  }
+
+  @Roles(['admin'])
+  @UseGuards(JWTAuthGuard, AuthorizationGuard)
+  @Get('')
+  getNextBlogSet(@Query('pageNo') pageNo , @Query('pageSize') pageSize ){
+    return this.blogService.nextBlogSet(pageNo,pageSize);
+  }
+
+  @Roles(['admin'])
+  @UseGuards(JWTAuthGuard, AuthorizationGuard)
+  @Get('')
+  getThisBlogSet(@Query('pageNo') pageNo , @Query('pageSize') pageSize ){
+    return this.blogService.thisBlogSet(pageNo,pageSize);
+  }
+
+  @Roles(['admin'])
+  @UseGuards(JWTAuthGuard, AuthorizationGuard)
+  @Get('')
+  getPrevBlogSet(@Query('pageNo') pageNo , @Query('pageSize') pageSize ){
+    return this.blogService.prevBlogSet(pageNo,pageSize);
   }
 
   // fetch all comments (comment ids) related to a particular blog

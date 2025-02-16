@@ -21,12 +21,9 @@ export class UsersService {
     region: this.configService.getOrThrow('AWS_S3_REGION'),
   });
 
-  getUrlFromBucket(s3Bucket, fileName) {
-    const {
-      config: { params, region },
-    } = s3Bucket;
-    const regionString = region.includes(process.env.AWS_S3_REGION) ? '' : '-' + region;
-    return `https://${params.Bucket}.s3${regionString}.amazonaws.com/${fileName}`;
+  getUrlFromBucket(fileName) {
+    const regionString = '-' + process.env.AWS_S3_REGION;
+    return `https://${process.env.AWS_S3_BUCKET}.s3${regionString}.amazonaws.com/${fileName}`;
   }
 
   async uploadFile(filename: string, file: Buffer) {
@@ -37,7 +34,7 @@ export class UsersService {
         Body: file,
       }),
     );
-    const url=this.getUrlFromBucket(process.env.AWS_S3_BUCKET,filename)
+    const url=this.getUrlFromBucket(filename)
     this.userRepository.update(GlobalService.user_id,{profile_url : url})
   }
 

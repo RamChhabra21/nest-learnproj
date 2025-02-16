@@ -3,10 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from 'src/typeorm/Comment';
 import { Repository } from 'typeorm';
 import { CreateCommentDto } from './dto/CreateComment.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { AuthorizationGuard } from 'src/auth/guards/access.guard';
-import { Reflector } from '@nestjs/core';
-import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
+import { error } from 'console';
 
 @Injectable()
 export class CommentsService {
@@ -39,11 +36,28 @@ export class CommentsService {
     return this.CommentRepository.delete(Comment_id);
   }
 
-  async getRangeComments(from: number = 1, to: number = 1e9) {
-    const reqcomments = await this.CommentRepository.find({
+  nextCommentSet(pageNo: number = 1, pageSize: number) {
+    return this.getRangeComments(pageNo * pageSize, (pageNo + 1) * pageSize, 20);
+  }
+
+  prevCommentSet(pageNo: number = 2, pageSize: number) {
+    if(pageNo < 2) return error(`no prev Comment pages`)
+    return this.getRangeComments((pageNo - 2) * pageSize, (pageNo - 1)  * pageSize, 20);
+  }
+
+  thisCommentSet(pageNo: number = 1, pageSize: number) {
+    return this.getRangeComments((pageNo - 1) * pageSize, pageNo * pageSize, 20);
+  }
+  
+  async getRangeComments(from: number = 1, to: number = 1e9, limit: number) {
+    if (to - from + 1 > limit)
+      return error(
+        `too many Comments requested per call, max limit is : ${limit}`,
+      );
+    const reqComments = await this.CommentRepository.find({
       take: to - from + 1,
       skip: from - 1,
     });
-    return reqcomments;
+    return reqComments;
   }
 }

@@ -28,17 +28,38 @@ export class CommentsController {
   @UseGuards(JWTAuthGuard, AuthorizationGuard)
   @Get('')
   getRangeComments(@Query('from') from , @Query('to') to ){
-    return this.CommentService.getRangeComments(from,to);
+    return this.CommentService.getRangeComments(from,to,20);
   }
 
-  @Roles(['admin', 'selfComment'])
+  @Roles(['admin'])
+  @UseGuards(JWTAuthGuard, AuthorizationGuard)
+  @Get('')
+  getNextCommentSet(@Query('pageNo') pageNo , @Query('pageSize') pageSize ){
+    return this.CommentService.nextCommentSet(pageNo,pageSize);
+  }
+
+  @Roles(['admin'])
+  @UseGuards(JWTAuthGuard, AuthorizationGuard)
+  @Get('')
+  getThisCommentSet(@Query('pageNo') pageNo , @Query('pageSize') pageSize ){
+    return this.CommentService.thisCommentSet(pageNo,pageSize);
+  }
+
+  @Roles(['admin'])
+  @UseGuards(JWTAuthGuard, AuthorizationGuard)
+  @Get('')
+  getPrevCommentSet(@Query('pageNo') pageNo , @Query('pageSize') pageSize ){
+    return this.CommentService.prevCommentSet(pageNo,pageSize);
+  }
+
+  @Roles(['admin'])
   @UseGuards(JWTAuthGuard, AuthorizationGuard)
   @Patch('update/:id')
   updateComment(@Param('id') id: number, @Body() updatedComment: UpdateCommentDto) {
     return this.CommentService.updateComment(id, updatedComment);
   }
 
-  @Roles(['admin', 'selfComment'])
+  @Roles(['admin'])
   @UseGuards(JWTAuthGuard, AuthorizationGuard)
   @Delete('delete/:id')
   deleteComment(@Param('id') id: number) {

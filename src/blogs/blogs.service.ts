@@ -1,10 +1,10 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Blog } from 'src/typeorm/Blog';
-import { FindOptionsWhere, QueryBuilder, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateBlogDto } from './dto/CreateBlog.dto';
 import { Comment } from 'src/typeorm/Comment';
-import { GlobalService } from 'src/utils/global.service';
+import { error } from 'console';
 
 @Injectable()
 export class BlogsService {
@@ -37,7 +37,24 @@ export class BlogsService {
     return this.BlogRepository.delete(blog_id);
   }
 
-  async getRangeBlogs(from: number = 1, to: number = 1e9) {
+  nextBlogSet(pageNo: number = 1, pageSize: number) {
+    return this.getRangeBlogs(pageNo * pageSize, (pageNo + 1) * pageSize, 20);
+  }
+
+  prevBlogSet(pageNo: number = 2, pageSize: number) {
+    if(pageNo < 2) return error(`no prev blog pages`)
+    return this.getRangeBlogs((pageNo - 2) * pageSize, (pageNo - 1)  * pageSize, 20);
+  }
+
+  thisBlogSet(pageNo: number = 1, pageSize: number) {
+    return this.getRangeBlogs((pageNo - 1) * pageSize, pageNo * pageSize, 20);
+  }
+
+  async getRangeBlogs(from: number = 1, to: number = 1e9, limit: number) {
+    if (to - from + 1 > limit)
+      return error(
+        `too many blogs requested per call, max limit is : ${limit}`,
+      );
     const reqblogs = await this.BlogRepository.find({
       take: to - from + 1,
       skip: from - 1,
