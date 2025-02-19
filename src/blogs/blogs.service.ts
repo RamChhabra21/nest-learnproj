@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateBlogDto } from './dto/CreateBlog.dto';
 import { Comment } from 'src/typeorm/Comment';
 import { error } from 'console';
+import OpenAI from 'openai';
 
 @Injectable()
 export class BlogsService {
@@ -14,6 +15,10 @@ export class BlogsService {
     @InjectRepository(Comment)
     private readonly CommentRepository: Repository<Comment>,
   ) {}
+
+  openai = new OpenAI({
+    apiKey : `${process.env.OPENAI_API_KEY}`
+  });  
 
   createBlog(createBlogDto: CreateBlogDto) {
     // this is done after validation
@@ -38,20 +43,32 @@ export class BlogsService {
   }
 
   nextBlogSet(pageNo: number = 1, pageSize: number) {
-    return this.getRangeBlogs(+pageNo * +pageSize + 1, (+pageNo + 1) * +pageSize, 20);
+    return this.getRangeBlogs(
+      +pageNo * +pageSize + 1,
+      (+pageNo + 1) * +pageSize,
+      20,
+    );
   }
 
   prevBlogSet(pageNo: number = 2, pageSize: number) {
-    if(pageNo < 2) return error(`no prev blog pages`)
-    return this.getRangeBlogs((+pageNo - 2) * +pageSize + 1, (+pageNo - 1)  * +pageSize, 20);
+    if (pageNo < 2) return error(`no prev blog pages`);
+    return this.getRangeBlogs(
+      (+pageNo - 2) * +pageSize + 1,
+      (+pageNo - 1) * +pageSize,
+      20,
+    );
   }
 
   thisBlogSet(pageNo: number = 1, pageSize: number) {
-    return this.getRangeBlogs((+pageNo - 1) * +pageSize + 1, +pageNo * +pageSize, 20);
+    return this.getRangeBlogs(
+      (+pageNo - 1) * +pageSize + 1,
+      +pageNo * +pageSize,
+      20,
+    );
   }
 
   async getRangeBlogs(from: number = 1, to: number = 1e9, limit: number) {
-    if ((to - from + 1) > limit){
+    if (to - from + 1 > limit) {
       return error(
         `too many blogs requested per call, max limit is : ${limit}`,
       );
@@ -72,5 +89,26 @@ export class BlogsService {
     return this.CommentRepository.find({
       where: conditions,
     });
+  }
+
+  async getSummary(blog_id: number) {
+    const blog = await this.readBlog(blog_id);
+    console.log(blog?.content)
+    const completion = await this.openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You are a helpful assistant.',
+        },
+        {
+          role: 'user',
+          content: `Generate a very brief blog summary in very simple english in less than 50 words for the blog content : \n ${blog?.content}`,
+        },
+      ],
+      store: true,
+    });
+    return completion.choices[0].message
   }
 }

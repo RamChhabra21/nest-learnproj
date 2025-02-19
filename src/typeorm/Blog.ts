@@ -19,7 +19,7 @@ export class Blog {
   @Column({
     name: 'content',
     nullable: true,
-    default: '',
+    type : 'longtext'
   })
   content: string;
 
