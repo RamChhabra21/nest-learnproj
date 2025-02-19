@@ -33,37 +33,38 @@ export class BlogsController {
 
   @Roles(['admin'])
   @UseGuards(JWTAuthGuard, AuthorizationGuard)
-  @Get(':id')
-  getBlog(@Param('id') id: number) {
-    return this.blogService.readBlog(id);
-  }
-
-  @Roles(['admin'])
-  @UseGuards(JWTAuthGuard, AuthorizationGuard)
-  @Get('')
-  getRangeBlogs(@Query('from') from , @Query('to') to ){
-    return this.blogService.getRangeBlogs(from,to,20);
-  }
-
-  @Roles(['admin'])
-  @UseGuards(JWTAuthGuard, AuthorizationGuard)
-  @Get('')
-  getNextBlogSet(@Query('pageNo') pageNo , @Query('pageSize') pageSize ){
+  @Get('next')
+  getNextBlogSet(@Query('pageNo') pageNo , @Query('pageSize') pageSize){
     return this.blogService.nextBlogSet(pageNo,pageSize);
   }
 
   @Roles(['admin'])
   @UseGuards(JWTAuthGuard, AuthorizationGuard)
-  @Get('')
+  @Get('this')
   getThisBlogSet(@Query('pageNo') pageNo , @Query('pageSize') pageSize ){
     return this.blogService.thisBlogSet(pageNo,pageSize);
   }
 
   @Roles(['admin'])
   @UseGuards(JWTAuthGuard, AuthorizationGuard)
-  @Get('')
+  @Get('prev')
   getPrevBlogSet(@Query('pageNo') pageNo , @Query('pageSize') pageSize ){
     return this.blogService.prevBlogSet(pageNo,pageSize);
+  }
+
+  @Roles(['admin'])
+  @UseGuards(JWTAuthGuard, AuthorizationGuard)
+  @Get(':id')
+  getBlog(@Param('id') id: number) {
+    return this.blogService.readBlog(id);
+  }
+
+
+  @Roles(['admin'])
+  @UseGuards(JWTAuthGuard, AuthorizationGuard)
+  @Get('')
+  getRangeBlogs(@Query('from') from , @Query('to') to ){
+    return this.blogService.getRangeBlogs(from,to,20);
   }
 
   // fetch all comments (comment ids) related to a particular blog
